@@ -1,0 +1,112 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/XSVBwiu8)
+= Évaluation d'un ensemble de dépôts Git
+Stéphane Lopes <stephane.lopes@uvsq.fr>, Pablo de Oliveira Castro <pablo.oliveira@uvsq.fr>
+v2025-2026
+:stem:
+:icons: font
+:experimental:
+:source-highlighter: highlightjs
+:imagesdir: figs/
+
+L'objectif de ce mini-projet est de créer une application en ligne de commande pour analyser et évaluer un ensemble de dépôts Git.
+L'application doit permettre de collecter des informations issues de Git (nombre de commits, timestamp du premier et du dernier commit, intervalle moyen entre les commits, etc.), d'exécuter des commandes dans chaque dépôt et d'en récupérer les résultats puis de les présenter de manière synthétique dans un fichier CSV.
+
+[IMPORTANT]
+.Contraintes techniques
+====
+Dans ce projet, vous respecterez les contraintes suivantes:
+
+* Ce projet est à réaliser par groupe de 4 étudiants en langage Rust.
+* Vous utiliserez `git` en effectuant des commits réguliers comportant des messages informatifs.
+Les membres du groupe devront contribuer de manière équitable au projet.
+* Le projet sera remis par _github classroom_.
+* Le _build_ sera assuré par Cargo.
+Aucune manipulation en dehors de Cargo ne devra être nécessaire.
+* Le projet devra pouvoir être vérifié par https://doc.rust-lang.org/clippy/[`clippy`] grace à la commande `cargo clippy`.
+Le projet devra minimiser le nombre d'avertissements issus de `clippy`.
+* Le projet devra respecter une mise en forme standard avec https://rust-lang.github.io/rustfmt/[`rustfmt`].
+Automatiser l'exécution de `rustfmt` (et `clippy`) avant un commit est par exemple possible en utilisant des https://git-scm.com/book/fr/v2/Personnalisation-de-Git-Crochets-Git[_pre-commits hooks_].
+* Le projet devra être documenté avec https://doc.rust-lang.org/rustdoc/[`rustdoc`].
+* Des tests unitaires devront être disponibles pour la plupart des méthodes développées.
+====
+
+[WARNING]
+.Membres du groupe
+====
+* RAZATOVO RANDRIANASOLO, Erwan, 22304502, Mowowglii
+* LEBAILLIF, Théo, 22303158, 5ways
+* SANKILICOGLU, Emel, 22301213, eeemeeel
+* GOUHIER, Marine, 22303270, Marine61
+====
+
+Ce projet se compose de plusieurs parties détaillées dans les sections suivantes.
+
+Tout ce qui n'est pas précisé dans le sujet est laissé à votre appréciation.
+Vous n’êtes pas limités à l’utilisation de la bibliothèque standard et vous êtes libres d’utiliser d’autres https://crates.io/[crates].
+
+== Collecte des statistiques Git
+Le programme doit parcourir les sous-répertoires d'un répertoire racine donné en argument de la ligne de commande.
+Pour chaque sous-répertoire contenant un dépôt git, vous devez collecter les statistiques suivantes:
+nombre total de commits,
+nombre de commits par auteur,
+timestamp du premier commit,
+timestamp du dernier commit,
+intervalle de temps minimum entre deux commits.
+intervalle de temps moyen entre deux commits,
+nombre de lignes modifiées (ajoutées + supprimées),
+taille moyenne des messages de commit (en nombre de caractères).
+
+== Exécution de commandes dans les dépôts
+Dans chaque dépôt, le programme exécutera les commandes précisées dans un fichier de configuration.
+
+CAUTION: Il ne devra pas être nécessaire de modifier le code source pour changer les commandes à exécuter.
+
+Pour chaque commande, le programme devra récupérer le code de retour et analyser la sortie standard pour en extraire les informations pertinentes.
+Le format de description de la sortie des commandes pourra par exemple s'appuyer sur des expressions régulières.
+
+Par exemple, lors de l'exécution des tests unitaires, le programme devra collecter le nombre de tests passés, réussis et échoués.
+Pour un projet Rust, la commande pourrait être `cargo test exercices` et en récupérant la ligne de sortie `"test result: FAILED. 2 passed; 7 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s"`, on peut en extraire le nombre de tests passés, échoués, etc.
+
+Un autre exemple pour un projet Java est présenté ci-dessous.
+
+.Exemple de description des commandes (format JSON)
+```json
+"commands" : [
+    {"name": "mvn", "cmd": ["./mvnw", "clean", "package", "-Dcheckstyle.skip", "-DskipTests"], "regex": ""},
+    {"name": "checkstyle", "cmd": ["./mvnw", "validate"], "regex": ""},
+    {
+        "name": "test",
+        "cmd": ["./mvnw", "test", "-Dcheckstyle.skip"],
+        "regex": "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+)$"
+    }
+]
+```
+
+== Génération du rapport CSV
+Le programme prendra en entrée un fichier CSV contenant une liste de noms de personne (nom, prénom, no d'identification, login github).
+
+Le programme devra générer un fichier CSV en joignant le fichier d'entrée avec les statistiques collectées pour chaque dépôt.
+Chaque ligne du fichier de sortie correspondra à une personne et contiendra l'ensemble des informations collectées pour le dépôt de cette personne.
+
+== Extensions optionnelles
+L'usage d'une bibliothèque de _logging_ est fortement recommandé pour faciliter le débogage et la maintenance du code.
+
+Les performances du programme peuvent devenir un enjeu important si le nombre de dépôts à analyser est grand.
+Vous pouvez envisager d'exécuter l'analyse des dépôts en parallèle et de mesurer/comparer l'efficacité des différentes approches.
+
+L'analyse des statistiques peut être enrichie avec d'autres métriques plus fines.
+La sortie pourrait être complétée par des rapports dans d'autres formats (JSON, Markdown) incluant des graphiques.
+
+En complément de la collecte de statistiques, le programme pourra proposer des recommandations visant à améliorer la qualité des dépôts analysés.
+Ces recommandations pourront s’appuyer sur les indicateurs calculés:
+par exemple, signaler la présence de fichiers objets ou compilés dans le dépôt, l’absence d’un fichier `.gitignore` adapté, de documentation (`README.md`, `LICENSE`), ou de tests unitaires.
+
+Vous pouvez expérimenter l’usage d’un modèle de génération de texte (IA générative locale ou distante) pour produire automatiquement ces recommandations à partir des statistiques collectées.
+L’idée est de transformer les données extraites (nombre de commits, taille des messages, présence de fichiers inutiles, etc.) en un résumé synthétique transmis au modèle, puis d’interpréter les suggestions retournées.
+
+== Références
+* Bibliothèques utiles:
+https://crates.io/crates/git2[git2],
+https://crates.io/crates/log[log],
+https://crates.io/crates/csv[csv],
+https://crates.io/crates/regex[regex].
