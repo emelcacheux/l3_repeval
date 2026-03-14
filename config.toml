@@ -1,0 +1,14 @@
+[[commands]]
+name = "test"
+cmd = "cargo test"
+regex = "test result: [A-Za-z]+\\. [0-9]+ passed; [0-9]+ failed; [0-9] ignored; [0-9]+ measured; [0-9]+ filtered out; finished in [0-9]+\\.[0-9]+s"
+
+[[commands]]
+name = "build"
+cmd = "cargo build"
+regex = "(Finished[^\n]*|error: [^\n]+)"
+
+[[commands]]
+name = "clippy"
+cmd = "cargo clippy"
+regex = "[0-9]+ warnings"
